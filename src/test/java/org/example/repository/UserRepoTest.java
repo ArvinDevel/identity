@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 
@@ -23,7 +22,7 @@ class UserRepoTest {
      */
     @Test
     public void testUserRepo() throws Exception {
-        User user = userRepo.findUserByName("John Smith");
+        User user = userRepo.findUserByEmail("John Smith");
         assertNull(user);
         Assertions.assertEquals(null, user);
     }

@@ -30,11 +30,11 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testEmptyUsername() throws Exception {
+    public void testEmptyPhone() throws Exception {
         IdentityParameters params = new IdentityParameters();
         params.setName("");
         int result = userService.signup(params);
-        assertEquals(-1, result);
+        assertEquals(-6, result);
     }
 
 
