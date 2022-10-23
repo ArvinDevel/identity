@@ -3,15 +3,12 @@ package org.example.entity;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import java.util.Date;
+import javax.persistence.*;
 
 @Getter
 @Setter
 @Entity
+@Table(name = "user_1021")
 public class User {
 
     @Id
@@ -22,12 +19,20 @@ public class User {
     String name;
 
     @Column
+    String email;
+
+    @Column
+    String phone;
+
+    @Column
+    String address;
+
+    @Column
+    int age;
+
+    @Column
+    String nation;
+
+    @Column
     String passwd;
-
-    @Column
-    String status;
-
-    @Column
-    Date registrationDate;
-
 }

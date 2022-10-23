@@ -31,7 +31,9 @@ class UserServiceImplTest {
 
     @Test
     public void testEmptyUsername() throws Exception {
-        int result = userService.signup("", "password");
+        IdentityParameters params = new IdentityParameters();
+        params.setName("");
+        int result = userService.signup(params);
         assertEquals(-1, result);
     }
 

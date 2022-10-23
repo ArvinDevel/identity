@@ -6,7 +6,6 @@ import org.example.repository.UserRepo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
 
 /**
  * Default Implementation of {@link UserService}
@@ -18,58 +17,93 @@ public class UserServiceImpl implements UserService {
 
 
     /**
-     * 1. validate input
-     * 2. check user exists
-     * 3. validate password
-     * 4. persistence
+     * * 1. validate input,    1.1 if valid password
+     * * 2. check user exists
+     * * 3. persistence
      *
-     * @param username
-     * @param password
+     * @param identityParameters
      * @return
      */
     @Override
-    public int signup(String username, String password) {
-        boolean invalidInput = StringUtils.isAnyBlank(username, password);
-        if (invalidInput) {
-            return -1;
+    public int signup(IdentityParameters identityParameters) {
+        String username = identityParameters.getName();
+        String password = identityParameters.getPasswd();
+        String email = identityParameters.getEmail();
+        String phone = identityParameters.getPhone();
+
+        // -6
+        boolean isPhoneValid = StringUtils.isNumeric(phone);
+        // -5
+        boolean isEmailValid = StringUtils.containsAny(email, "@");
+        // -3
+        boolean isPasswdValid = StringUtils.length(password) > 5;
+        // -4
+        boolean isUserNameValid = StringUtils.isNotEmpty(username);
+
+        if (!isPhoneValid) {
+            return -6;
         }
-        User user = userRepo.findUserByName(username);
-        if (null != user) {
+
+        if (!isEmailValid) {
+            return -5;
+        }
+
+        if (!isPasswdValid) {
+            return -3;
+        }
+
+        if (!isUserNameValid) {
+            return -4;
+        }
+
+        // step2
+        boolean isSameEmailFound = userRepo.findUserByEmail(email) != null;
+        boolean isSamePhoneFound = userRepo.findUserByPhone(phone) != null;
+
+        if (isSameEmailFound || isSamePhoneFound) {
             return -2;
         }
 
-        if (password.length() < 6) {
-            return -3;
-        }
         User newUser = new User();
         newUser.setName(username);
         newUser.setPasswd(password);
-        newUser.setStatus("active");
-        newUser.setRegistrationDate(new Date());
+        newUser.setPhone(phone);
+        newUser.setEmail(email);
+
         userRepo.save(newUser);
         return 0;
     }
 
     /**
-     * 1. validate input
-     * 2. validate user exists
-     * 3. verify password
+     * **
+     * * 1. validate input
+     * * 2. validate user exists
+     * * 3. verify password
      *
-     * @param username
-     * @param password
+     * @param identityParameters
      * @throws UserException
      */
     @Override
-    public void login(String username, String password) throws UserException {
-        boolean invalidInput = StringUtils.isAnyBlank(username, password);
-        if (invalidInput) {
+    public void login(IdentityParameters identityParameters) throws UserException {
+        String password = identityParameters.getPasswd();
+        String email = identityParameters.getEmail();
+        String phone = identityParameters.getPhone();
+        boolean invalidPasswd = StringUtils.isBlank(password);
+        boolean invalidId = StringUtils.isAllBlank(email, phone);
+        if (invalidPasswd || invalidId) {
             throw new UserException.InvalidParameterException("parameters invalid");
         }
-        User user = userRepo.findUserByName(username);
-        if (null == user) {
-            throw new UserException.UserNotFoundException("User " + username + " does not exist");
+        User userByEmail = userRepo.findUserByEmail(email);
+        User userByPhone = userRepo.findUserByPhone(phone);
+        if (null == userByEmail && null == userByPhone) {
+            throw new UserException.UserNotFoundException("User " + email + " " + phone + " does not exist");
         }
-        if (!password.equals(user.getPasswd())) {
+
+        if (userByEmail != null && !password.equals(userByEmail.getPasswd())) {
+            throw new UserException.InvalidPasswdException("Passwords do not match");
+        }
+
+        if (userByPhone != null && !password.equals(userByPhone.getPasswd())) {
             throw new UserException.InvalidPasswdException("Passwords do not match");
         }
     }
