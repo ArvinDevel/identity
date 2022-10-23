@@ -57,6 +57,12 @@ public class UserController {
         try {
             userService.login(identityParameters);
             result = "success";
+        } catch (UserException.InvalidParameterException paramException) {
+            result = "paramEerror";
+        } catch (UserException.UserNotFoundException userNotFoundException) {
+            result = "userNotFound";
+        } catch (UserException.InvalidPasswdException invalidPasswdException) {
+            result = "invalidPasswdException";
         } catch (UserException userException) {
             userException.printStackTrace();
             result = "failure";
