@@ -7,6 +7,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+/**
+ * default crossOrigin configured to allow * for such case frontend can't set 'credentials' as 'include' mode
+ */
+@CrossOrigin
 @RestController
 public class UserController {
     @Resource
